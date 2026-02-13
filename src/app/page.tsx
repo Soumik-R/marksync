@@ -69,17 +69,25 @@
 
 "use client";
 
-import { useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function Home() {
-  useEffect(() => {
-    const test = async () => {
-      const { data, error } = await supabase.from("test").select("*");
-      console.log(data, error);
-    };
-    test();
-  }, []);
 
-  return <div className="p-10 text-xl">Supabase Connected</div>;
+  const login = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "google"
+    });
+  };
+
+  return (
+    <div className="flex h-screen items-center justify-center">
+      <button
+        onClick={login}
+        className="px-6 py-3 bg-black text-white rounded-lg"
+      >
+        Login with Google
+      </button>
+    </div>
+  );
 }
+
