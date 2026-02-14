@@ -104,6 +104,7 @@ export default function Home() {
     fetchBookmarks();
   };
 
+  // UseEffect -> Updating stuff, supabaseAuth listner
   useEffect(() => {
     const getUser = async () => {
       const { data } = await supabase.auth.getUser();
