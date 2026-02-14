@@ -21,8 +21,8 @@ export default function Home() {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
 
   //FetchBookmarks
-  const fetchBookmarks = useCallback(async () => {
-    if (!user) return;
+  const fetchBookmarks = useCallback(async (currentUser: User | null = user) => {
+    if (!currentUser) return;
 
     const { data, error } = await supabase
       .from("bookmarks")
@@ -34,7 +34,7 @@ export default function Home() {
 
   const deleteBookmark = async (id: string) => {
     await supabase.from("bookmarks").delete().eq("id", id);
-    fetchBookmarks();
+    fetchBookmarks(user);
   };
 
   // UseEffect -> Updating stuff, supabaseAuth listner
@@ -46,7 +46,7 @@ export default function Home() {
       if (mounted) {
         setUser(data.user);
         
-        if (data.user) fetchBookmarks();
+        if (data.user) fetchBookmarks(data.user);
       }
     };
 
@@ -57,7 +57,7 @@ export default function Home() {
       if (mounted) {
         setUser(currentUser);
         
-        if (currentUser) fetchBookmarks();
+        if (currentUser) fetchBookmarks(currentUser);
       }
     });
 
@@ -140,7 +140,7 @@ export default function Home() {
           animation-delay: 1.4s;
         }
       `}</style>
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-[#77fcef] to-pink-50 flex items-center p-8">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-[#77fcef] to-pink-50 flex flex-col md:flex-row items-center p-8">
       {/* Left Section - Project Name */}
       <div className="flex-1 flex items-start justify-center px-8">
         <div className="flex flex-col items-center">
@@ -232,13 +232,19 @@ export default function Home() {
           <div className="bg-white/80 backdrop-blur-lg shadow-2xl rounded-3xl p-8 w-full max-w-md space-y-6 border border-white/20">
 
           <div className="text-center border-b border-gray-200 pb-4">
-            <img
-              src={user.user_metadata.avatar_url}
-              alt={user.user_metadata.full_name || "User avatar"}
-              className="w-20 h-20 rounded-full mx-auto mb-3 ring-4 ring-purple-200 shadow-lg"
-            />
+            {user.user_metadata?.avatar_url ? (
+              <img
+                src={user.user_metadata.avatar_url}
+                alt={user.user_metadata?.full_name || "User avatar"}
+                className="w-20 h-20 rounded-full mx-auto mb-3 ring-4 ring-purple-200 shadow-lg"
+              />
+            ) : (
+              <div className="w-20 h-20 rounded-full mx-auto mb-3 ring-4 ring-purple-200 shadow-lg bg-gradient-to-br from-purple-400 to-blue-500 flex items-center justify-center text-white text-3xl font-bold">
+                {user.email?.charAt(0).toUpperCase() || "U"}
+              </div>
+            )}
             <h2 className="font-bold text-2xl text-gray-900 mb-1">
-              {user.user_metadata.full_name}
+              {user.user_metadata?.full_name || user.email?.split('@')[0] || "User"}
             </h2>
             <p className="text-sm text-gray-500">Manage Your Bookmarks</p>
           </div>
