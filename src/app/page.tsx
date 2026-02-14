@@ -69,31 +69,80 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import type { User } from "@supabase/supabase-js";
+
+type Bookmark = {
+  id: string;
+  title: string;
+  url: string;
+  user_id: string;
+  created_at: string;
+};
 
 export default function Home() {
   const [user, setUser] = useState<User | null>(null);
   const [title, setTitle] = useState("");
   const [url, setUrl] = useState("");
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
+
+  //FetchBookmarks
+  const fetchBookmarks = useCallback(async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from("bookmarks")
+      .select("*")
+      .order("id", { ascending: false });
+
+    if (!error && data) setBookmarks(data);
+  }, [user]);
+
+  const deleteBookmark = async (id: string) => {
+    await supabase.from("bookmarks").delete().eq("id", id);
+    fetchBookmarks();
+  };
 
   useEffect(() => {
     const getUser = async () => {
       const { data } = await supabase.auth.getUser();
       setUser(data.user);
+      
+      if (data.user) fetchBookmarks();
     };
 
     getUser();
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+      
+      if (currentUser) fetchBookmarks();
     });
 
     return () => {
       listener.subscription.unsubscribe();
     };
-  }, []);
+
+  const channel = supabase
+  .channel("realtime-bookmarks")
+  .on(
+    "postgres_changes",
+    { event: "*", schema: "public", table: "bookmarks" },
+    () => {
+      fetchBookmarks();
+    }
+  )
+  .subscribe();
+
+  return () => {
+  listener.subscription.unsubscribe();
+  supabase.removeChannel(channel);
+  };
+
+}, [fetchBookmarks]);
+
 
   const login = async () => {
     await supabase.auth.signInWithOAuth({ provider: "google" });
@@ -119,7 +168,7 @@ export default function Home() {
     else {
       setTitle("");
       setUrl("");
-      alert("Bookmark saved!");
+      fetchBookmarks();
     }
   };
 
@@ -159,6 +208,26 @@ export default function Home() {
           >
             Save Bookmark
           </button>
+
+          <div className="space-y-2">
+            {bookmarks.map((b) => (
+              <div
+                key={b.id}
+                className="border p-3 rounded flex justify-between items-center"
+              >
+                <a href={b.url} target="_blank" className="text-blue-600 underline">
+                  {b.title}
+                </a>
+
+                <button
+                  onClick={() => deleteBookmark(b.id)}
+                  className="text-red-500 font-bold"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
 
           <br />
 
