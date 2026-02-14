@@ -170,43 +170,50 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-screen items-center justify-center">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       {!user ? (
-        <button onClick={login} className="px-6 py-3 bg-black text-white rounded-lg">
+        <button
+          onClick={login}
+          className="px-6 py-3 bg-black text-white rounded-xl shadow-lg hover:scale-105 transition"
+        >
           Login with Google
         </button>
       ) : (
-        <div className="space-y-4 text-center">
-          <h1 className="text-xl font-bold">
-            Welcome {user.user_metadata.full_name}
-          </h1>
+        <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md space-y-5">
+
+          <div className="text-center">
+            <img
+              src={user.user_metadata.avatar_url}
+              alt={user.user_metadata.full_name || "User avatar"}
+              className="w-16 h-16 rounded-full mx-auto mb-2"
+            />
+            <h2 className="font-bold text-lg">
+              {user.user_metadata.full_name}
+            </h2>
+          </div>
 
           <input
-            type="text"
             placeholder="Bookmark Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="border p-2 rounded w-64"
+            className="border p-2 rounded w-full"
           />
 
           <input
-            type="text"
             placeholder="https://example.com"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            className="border p-2 rounded w-64"
+            className="border p-2 rounded w-full"
           />
-
-          <br />
 
           <button
             onClick={addBookmark}
-            className="px-6 py-2 bg-green-600 text-white rounded"
+            className="bg-green-600 text-white w-full py-2 rounded-lg"
           >
             Save Bookmark
           </button>
 
-          <div className="space-y-2">
+          <div className="space-y-2 max-h-60 overflow-y-auto">
             {bookmarks.map((b) => (
               <div
                 key={b.id}
@@ -226,14 +233,13 @@ export default function Home() {
             ))}
           </div>
 
-          <br />
-
           <button
             onClick={logout}
-            className="px-6 py-2 bg-red-500 text-white rounded"
+            className="w-full bg-red-500 text-white py-2 rounded-lg"
           >
             Logout
           </button>
+
         </div>
       )}
     </div>
