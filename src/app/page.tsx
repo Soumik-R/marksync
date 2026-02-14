@@ -171,9 +171,9 @@ export default function Home() {
 
   //UI changes
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 flex items-center p-8">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 flex items-start p-8">
       {/* Left Section - Project Name */}
-      <div className="flex-1 flex items-center justify-center px-8">
+      <div className="flex-1 flex items-start justify-center px-8">
         <h1 className="text-8xl font-black bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
           MARKSYNC
         </h1>
