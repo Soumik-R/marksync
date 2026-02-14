@@ -106,20 +106,26 @@ export default function Home() {
 
   // UseEffect -> Updating stuff, supabaseAuth listner
   useEffect(() => {
+    let mounted = true;
+
     const getUser = async () => {
       const { data } = await supabase.auth.getUser();
-      setUser(data.user);
-      
-      if (data.user) fetchBookmarks();
+      if (mounted) {
+        setUser(data.user);
+        
+        if (data.user) fetchBookmarks();
+      }
     };
 
     getUser();
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       const currentUser = session?.user ?? null;
-      setUser(currentUser);
-      
-      if (currentUser) fetchBookmarks();
+      if (mounted) {
+        setUser(currentUser);
+        
+        if (currentUser) fetchBookmarks();
+      }
     });
 
     // Channel Function
@@ -129,12 +135,13 @@ export default function Home() {
         "postgres_changes",
         { event: "*", schema: "public", table: "bookmarks" },
         () => {
-          fetchBookmarks();
+          if (mounted) fetchBookmarks();
         }
       )
       .subscribe();
 
     return () => {
+      mounted = false;
       listener.subscription.unsubscribe();
       supabase.removeChannel(channel);
     };
@@ -179,6 +186,22 @@ export default function Home() {
             MARKSYNC
           </h1>
           <div className="w-64 h-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full mt-4"></div>
+          
+          {/* Instructions */}
+          <div className="mt-24 space-y-10">
+            <div className="flex items-center gap-6">
+              <span className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent w-16 text-right">1.</span>
+              <p className="text-3xl font-medium text-gray-700">Enter Bookmark Title</p>
+            </div>
+            <div className="flex items-center gap-6">
+              <span className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent w-16 text-right">2.</span>
+              <p className="text-3xl font-medium text-gray-700">Give us the link</p>
+            </div>
+            <div className="flex items-center gap-6">
+              <span className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent w-16 text-right">3.</span>
+              <p className="text-3xl font-medium text-gray-700">Forget about it</p>
+            </div>
+          </div>
         </div>
       </div>
 
