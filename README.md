@@ -2,7 +2,7 @@
 
 **Your Beautiful Bookmark Manager**
 
-MarkSync is a modern, real-time bookmark management application that helps you organize and sync your favorite links across devices. Built with cutting-edge technologies and a beautiful, responsive UI.
+MarkSync is a modern, real time bookmark management application that helps you organize and sync your favorite links across devices. Built with cutting edge technologies.
 
 ## ✨ Features
 
@@ -41,32 +41,6 @@ MarkSync is a modern, real-time bookmark management application that helps you o
 | [PostCSS](https://postcss.org/) | - | CSS processing |
 | [Turbopack](https://turbo.build/pack) | Built-in | Fast bundler for Next.js |
 
-### Fonts
-
-- [Geist Sans](https://vercel.com/font) - Modern sans-serif font
-- [Geist Mono](https://vercel.com/font) - Monospace font
-
-## 📁 Project Structure
-
-```
-marksync/
-├── src/
-│   ├── app/
-│   │   ├── globals.css          # Global styles and animations
-│   │   ├── layout.tsx           # Root layout component
-│   │   └── page.tsx             # Main page with authentication & bookmarks
-│   └── lib/
-│       └── supabaseClient.ts    # Supabase client configuration
-├── public/                      # Static assets
-├── .env.local                   # Environment variables (not in git)
-├── next.config.ts               # Next.js configuration
-├── tsconfig.json               # TypeScript configuration
-├── tailwind.config.ts          # Tailwind CSS configuration
-├── postcss.config.mjs          # PostCSS configuration
-├── eslint.config.mjs           # ESLint configuration
-└── package.json                # Project dependencies
-
-```
 
 ## 🚀 Getting Started
 
@@ -211,17 +185,7 @@ npm run lint
 
 ### Real-time Synchronization
 
-MarkSync uses Supabase Realtime to instantly sync bookmarks across all connected clients:
-
-```typescript
-const channel = supabase
-  .channel("realtime-bookmarks")
-  .on("postgres_changes", 
-    { event: "*", schema: "public", table: "bookmarks" },
-    () => fetchBookmarks()
-  )
-  .subscribe();
-```
+MarkSync uses Supabase Realtime to instantly sync bookmarks across all connected clients.
 
 ### Authentication Flow
 
@@ -270,13 +234,9 @@ Make sure your environment variables are properly set:
 2. Ensure redirect URL matches your deployment URL
 3. Check Google OAuth settings
 
-## 📝 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
 ## 👨‍💻 Author
 
-Created with ❤️ by [Your Name]
+Created with ❤️ by Soumik
 
 ## 🤝 Contributing
 
