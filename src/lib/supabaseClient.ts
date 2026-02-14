@@ -7,7 +7,13 @@ export function getSupabase() {
   if (!supabaseInstance) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://dummy.supabase.co";
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1bW15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2NDUxOTI4MTIsImV4cCI6MTk2MDc2ODgxMn0.dummy";
-    supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
+    supabaseInstance = createClient(supabaseUrl, supabaseAnonKey, {
+      realtime: {
+        params: {
+          eventsPerSecond: 10,
+        },
+      },
+    });
   }
   return supabaseInstance;
 }
