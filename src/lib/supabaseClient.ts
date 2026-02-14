@@ -1,24 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
-import type { SupabaseClient } from "@supabase/supabase-js";
 
-let supabaseInstance: SupabaseClient | null = null;
+// Provide dummy values for build time that won't throw errors
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://dummy.supabase.co";
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR1bW15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE2NDUxOTI4MTIsImV4cCI6MTk2MDc2ODgxMn0.dummy";
 
-export function getSupabase() {
-  if (typeof window === 'undefined') {
-    // During build/SSR, return a mock client
-    return {} as SupabaseClient;
-  }
-
-  if (supabaseInstance) {
-    return supabaseInstance;
-  }
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-  supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
-  return supabaseInstance;
-}
-
-// For backward compatibility
-export const supabase = getSupabase();
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
