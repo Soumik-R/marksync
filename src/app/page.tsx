@@ -188,7 +188,7 @@ export default function Home() {
               alt={user.user_metadata.full_name || "User avatar"}
               className="w-16 h-16 rounded-full mx-auto mb-2"
             />
-            <h2 className="font-bold text-lg">
+            <h2 className="font-bold text-lg text-gray-900">
               {user.user_metadata.full_name}
             </h2>
           </div>
@@ -197,14 +197,14 @@ export default function Home() {
             placeholder="Bookmark Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="border p-2 rounded w-full"
+            className="border p-2 rounded w-full text-gray-900 placeholder-gray-500"
           />
 
           <input
             placeholder="https://example.com"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            className="border p-2 rounded w-full"
+            className="border p-2 rounded w-full text-gray-900 placeholder-gray-500"
           />
 
           <button
