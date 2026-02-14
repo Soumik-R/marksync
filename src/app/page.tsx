@@ -231,6 +231,13 @@ export default function Home() {
               <p className="text-3xl font-medium text-gray-700">Forget about it</p>
             </div>
           </div>
+          
+          {/* Made By */}
+          <div className="mt-16 text-center">
+            <p className="text-lg font-medium bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              Made by Soumik Roy with ❤️
+            </p>
+          </div>
         </div>
       </div>
 
