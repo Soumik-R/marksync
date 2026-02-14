@@ -69,25 +69,110 @@
 
 "use client";
 
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import type { User } from "@supabase/supabase-js";
 
 export default function Home() {
+  const [user, setUser] = useState<User | null>(null);
+  const [title, setTitle] = useState("");
+  const [url, setUrl] = useState("");
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUser(data.user);
+    };
+
+    getUser();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, []);
 
   const login = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "google"
-    });
+    await supabase.auth.signInWithOAuth({ provider: "google" });
+  };
+
+  const logout = async () => {
+    await supabase.auth.signOut();
+  };
+
+  const addBookmark = async () => {
+    if (!title || !url) return alert("Fill all fields");
+    if (!user) return alert("User not found");
+
+    const { error } = await supabase.from("bookmarks").insert([
+      {
+        title,
+        url,
+        user_id: user.id,
+      },
+    ]);
+
+    if (error) alert(error.message);
+    else {
+      setTitle("");
+      setUrl("");
+      alert("Bookmark saved!");
+    }
   };
 
   return (
     <div className="flex h-screen items-center justify-center">
-      <button
-        onClick={login}
-        className="px-6 py-3 bg-black text-white rounded-lg"
-      >
-        Login with Google
-      </button>
+      {!user ? (
+        <button onClick={login} className="px-6 py-3 bg-black text-white rounded-lg">
+          Login with Google
+        </button>
+      ) : (
+        <div className="space-y-4 text-center">
+          <h1 className="text-xl font-bold">
+            Welcome {user.user_metadata.full_name}
+          </h1>
+
+          <input
+            type="text"
+            placeholder="Bookmark Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="border p-2 rounded w-64"
+          />
+
+          <input
+            type="text"
+            placeholder="https://example.com"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            className="border p-2 rounded w-64"
+          />
+
+          <br />
+
+          <button
+            onClick={addBookmark}
+            className="px-6 py-2 bg-green-600 text-white rounded"
+          >
+            Save Bookmark
+          </button>
+
+          <br />
+
+          <button
+            onClick={logout}
+            className="px-6 py-2 bg-red-500 text-white rounded"
+          >
+            Logout
+          </button>
+        </div>
+      )}
     </div>
   );
 }
+
+
 
