@@ -281,7 +281,7 @@ export default function Home() {
       {/* Right Section - Login/Dashboard Card */}
       <div className="flex-1 flex items-center justify-center px-8">
         {!user ? (
-          <div className="text-center space-y-6">
+          <div className="text-center space-y-6 bg-white/30 backdrop-blur-md rounded-3xl p-12 shadow-xl border border-white/40">
             <div className="space-y-2">
               <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                 MarkSync
