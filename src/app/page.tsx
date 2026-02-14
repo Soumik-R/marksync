@@ -174,9 +174,12 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-[#77fcef] to-pink-50 flex items-start p-8">
       {/* Left Section - Project Name */}
       <div className="flex-1 flex items-start justify-center px-8">
-        <h1 className="text-8xl font-black bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-          MARKSYNC
-        </h1>
+        <div className="flex flex-col items-center">
+          <h1 className="text-8xl font-black bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            MARKSYNC
+          </h1>
+          <div className="w-64 h-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full mt-4"></div>
+        </div>
       </div>
 
       {/* Right Section - Login/Dashboard Card */}
