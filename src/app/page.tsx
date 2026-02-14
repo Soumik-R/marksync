@@ -122,27 +122,23 @@ export default function Home() {
       if (currentUser) fetchBookmarks();
     });
 
+    // Channel Function
+    const channel = supabase
+      .channel("realtime-bookmarks")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "bookmarks" },
+        () => {
+          fetchBookmarks();
+        }
+      )
+      .subscribe();
+
     return () => {
       listener.subscription.unsubscribe();
+      supabase.removeChannel(channel);
     };
-
-  const channel = supabase
-  .channel("realtime-bookmarks")
-  .on(
-    "postgres_changes",
-    { event: "*", schema: "public", table: "bookmarks" },
-    () => {
-      fetchBookmarks();
-    }
-  )
-  .subscribe();
-
-  return () => {
-  listener.subscription.unsubscribe();
-  supabase.removeChannel(channel);
-  };
-
-}, [fetchBookmarks]);
+  }, [fetchBookmarks]);
 
 
   const login = async () => {
