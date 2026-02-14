@@ -171,72 +171,94 @@ export default function Home() {
 
   //UI changes
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 flex items-center justify-center p-4">
       {!user ? (
-        <button
-          onClick={login}
-          className="px-6 py-3 bg-black text-white rounded-xl shadow-lg hover:scale-105 transition"
-        >
-          Login with Google
-        </button>
+        <div className="text-center space-y-6">
+          <div className="space-y-2">
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              MarkSync
+            </h1>
+            <p className="text-gray-600 text-lg">Your Beautiful Bookmark Manager</p>
+          </div>
+          <button
+            onClick={login}
+            className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-2xl shadow-2xl hover:shadow-purple-500/50 hover:scale-105 transition-all duration-300 font-semibold"
+          >
+            Login with Google
+          </button>
+        </div>
       ) : (
-        <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md space-y-5">
+        <div className="bg-white/80 backdrop-blur-lg shadow-2xl rounded-3xl p-8 w-full max-w-md space-y-6 border border-white/20">
 
-          <div className="text-center">
+          <div className="text-center border-b border-gray-200 pb-4">
             <img
               src={user.user_metadata.avatar_url}
               alt={user.user_metadata.full_name || "User avatar"}
-              className="w-16 h-16 rounded-full mx-auto mb-2"
+              className="w-20 h-20 rounded-full mx-auto mb-3 ring-4 ring-purple-200 shadow-lg"
             />
-            <h2 className="font-bold text-lg text-gray-900">
+            <h2 className="font-bold text-2xl text-gray-900 mb-1">
               {user.user_metadata.full_name}
             </h2>
+            <p className="text-sm text-gray-500">Manage Your Bookmarks</p>
           </div>
 
-          <input
-            placeholder="Bookmark Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="border p-2 rounded w-full text-gray-900 placeholder-gray-500"
-          />
+          <div className="space-y-3">
+            <input
+              placeholder="Bookmark Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="border-2 border-gray-200 p-3 rounded-xl w-full text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all outline-none"
+            />
 
-          <input
-            placeholder="https://example.com"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            className="border p-2 rounded w-full text-gray-900 placeholder-gray-500"
-          />
+            <input
+              placeholder="https://example.com"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              className="border-2 border-gray-200 p-3 rounded-xl w-full text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all outline-none"
+            />
 
-          <button
-            onClick={addBookmark}
-            className="bg-green-600 text-white w-full py-2 rounded-lg"
-          >
-            Save Bookmark
-          </button>
+            <button
+              onClick={addBookmark}
+              className="bg-gradient-to-r from-green-500 to-emerald-600 text-white w-full py-3 rounded-xl font-semibold hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02]"
+            >
+              Save Bookmark
+            </button>
+          </div>
 
-          <div className="space-y-2 max-h-60 overflow-y-auto">
-            {bookmarks.map((b) => (
-              <div
-                key={b.id}
-                className="border p-3 rounded flex justify-between items-center"
-              >
-                <a href={b.url} target="_blank" className="text-blue-600 underline">
-                  {b.title}
-                </a>
-
-                <button
-                  onClick={() => deleteBookmark(b.id)}
-                  className="text-red-500 font-bold"
-                >
-                  ✕
-                </button>
+          <div className="space-y-3 max-h-64 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-purple-300 scrollbar-track-gray-100">
+            {bookmarks.length === 0 ? (
+              <div className="text-center py-8 text-gray-400">
+                <p className="text-4xl mb-2">📚</p>
+                <p>No bookmarks yet. Start saving!</p>
               </div>
-            ))}
+            ) : (
+              bookmarks.map((b) => (
+                <div
+                  key={b.id}
+                  className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 p-4 rounded-xl flex justify-between items-center hover:shadow-md transition-all group hover:scale-[1.02]"
+                >
+                  <a 
+                    href={b.url} 
+                    target="_blank" 
+                    className="text-gray-800 hover:text-purple-600 transition-colors font-medium flex-1 truncate pr-3"
+                  >
+                    {b.title}
+                  </a>
+
+                  <button
+                    onClick={() => deleteBookmark(b.id)}
+                    className="text-red-400 hover:text-red-600 font-bold text-xl transition-all hover:scale-125 hover:rotate-90 duration-200"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))
+            )}
           </div>
 
           <button
             onClick={logout}
-            className="w-full bg-red-500 text-white py-2 rounded-lg"
+            className="w-full bg-gradient-to-r from-red-500 to-pink-600 text-white py-3 rounded-xl font-semibold hover:from-red-600 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl"
           >
             Logout
           </button>
