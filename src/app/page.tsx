@@ -211,7 +211,7 @@ export default function Home() {
       {/* Left Section - Project Name */}
       <div className="flex-1 flex items-start justify-center px-8">
         <div className="flex flex-col items-center">
-          <h1 className="text-8xl font-black bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          <h1 className="text-8xl font-black bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent pb-2">
             MARKSYNC
           </h1>
           <div className="w-64 h-1 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full mt-4"></div>
@@ -282,8 +282,8 @@ export default function Home() {
       <div className="flex-1 flex items-center justify-center px-8">
         {!user ? (
           <div className="text-center space-y-6 bg-white/30 backdrop-blur-md rounded-3xl p-12 shadow-xl border border-white/40">
-            <div className="space-y-2">
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <div className="space-y-2 overflow-visible">
+              <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent pb-2 leading-tight">
                 MarkSync
               </h1>
               <p className="text-gray-600 text-lg">Your Beautiful Bookmark Manager</p>
