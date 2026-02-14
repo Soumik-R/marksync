@@ -141,57 +141,9 @@ The app looked great on desktop but was unusable on mobile:
 </h1>
 ```
 
-**Key Changes:**
-1. **Layout:** Changed from `md:flex-row` to `lg:flex-row` for better tablet experience
-2. **Typography:** Implemented responsive text sizes (text-4xl → text-8xl)
-3. **Spacing:** Used responsive padding (`p-4 sm:p-6 md:p-8`)
-4. **Components:** Made all UI elements scale appropriately
-5. **Touch Targets:** Ensured buttons and inputs are finger-friendly on mobile
-
-**Breakpoint Strategy:**
-- **Mobile** (`< 640px`): Compact, single-column layout
-- **Tablet** (`640px - 1024px`): Increased spacing, still single-column
-- **Desktop** (`≥ 1024px`): Two-column layout, maximum sizes
-
-**Result:** App now provides optimal experience on all devices from iPhone SE to 4K monitors.
-
 ---
 
-### 4. **Supabase Client Initialization**
-
-#### Problem
-Multiple instances of Supabase client were being created, potentially causing memory leaks and connection issues.
-
-#### Solution
-Implemented singleton pattern with lazy initialization:
-
-```typescript
-let supabaseInstance: SupabaseClient | null = null;
-
-export function getSupabase() {
-  if (!supabaseInstance) {
-    supabaseInstance = createClient(url, key, config);
-  }
-  return supabaseInstance;
-}
-
-// Proxy for backward compatibility
-export const supabase = new Proxy({} as SupabaseClient, {
-  get: (_target, prop) => {
-    const client = getSupabase();
-    return client[prop as keyof SupabaseClient];
-  }
-});
-```
-
-**Benefits:**
-- Single client instance across the app
-- Lazy initialization (only created when needed)
-- Backward compatible with existing code
-
----
-
-### 5. **Row Level Security (RLS) Policies**
+### 4. **Row Level Security (RLS) Policies**
 
 #### Problem
 Users could potentially see or modify other users' bookmarks without proper security policies.
@@ -221,35 +173,6 @@ CREATE POLICY "Users can delete their own bookmarks"
 - Automatic enforcement by PostgreSQL
 - Protection against API manipulation
 - Works seamlessly with real-time subscriptions
-
----
-
-### 6. **Optimistic UI Updates**
-
-#### Problem
-When deleting a bookmark, there was a noticeable delay before the UI updated, making the app feel slow.
-
-#### Solution
-Implemented optimistic updates:
-
-```typescript
-const deleteBookmark = async (id: string) => {
-  // Optimistic update - remove from UI immediately
-  setBookmarks(prev => prev.filter(b => b.id !== id));
-  
-  const { error } = await supabase
-    .from("bookmarks")
-    .delete()
-    .eq("id", id);
-  
-  if (error) {
-    // Revert on error
-    await fetchBookmarks();
-  }
-};
-```
-
-**Result:** Instant UI feedback, better user experience.
 
 ---
 
