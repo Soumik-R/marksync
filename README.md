@@ -2,45 +2,256 @@
 
 **Your Beautiful Bookmark Manager**
 
-MarkSync is a modern, real time bookmark management application that helps you organize and sync your favorite links across devices. Built with cutting edge technologies.
+A modern, real-time bookmark management application built with Next.js 16, Supabase, and TypeScript. Save, organize, and sync your bookmarks instantly across all devices.
+
+![Made with Next.js](https://img.shields.io/badge/Next.js-16.1.6-black?style=flat-square&logo=next.js)
+![React](https://img.shields.io/badge/React-19.2.3-blue?style=flat-square&logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)
+![Supabase](https://img.shields.io/badge/Supabase-2.95.3-green?style=flat-square&logo=supabase)
+
+---
+
+## 📋 Table of Contents
+
+- [Features](#-features)
+- [Tech Stack](#️-tech-stack)
+- [Problems Faced & Solutions](#-problems-faced--solutions)
+- [Getting Started](#-getting-started)
+- [Deployment](#-deployment)
+- [Author](#-author)
+
+---
 
 ## ✨ Features
 
 - 🔐 **Google OAuth Authentication** - Secure login with Google
-- 📱 **Real-time Sync** - Bookmarks update instantly across all devices
+- 📱 **Real-time Sync** - Bookmarks update instantly across all open tabs
 - 🎨 **Beautiful UI** - Modern gradient design with smooth animations
-- 📲 **Fully Responsive** - Works seamlessly on desktop, tablet, and mobile
+- 📲 **Fully Responsive** - Optimized for mobile, tablet, and desktop
 - ⚡ **Lightning Fast** - Built with Next.js 16 and Turbopack
-- 🗄️ **Supabase Backend** - Reliable cloud database and authentication
-- 🔄 **Live Updates** - Real-time data synchronization using Supabase Realtime
-- 🎯 **TypeScript** - Type-safe development experience
+- 🗄️ **Supabase Backend** - PostgreSQL database with Row Level Security
+- 🔄 **Live Updates** - WebSocket-based real-time synchronization
+- 🎯 **Type-Safe** - Full TypeScript support
+
+---
 
 ## 🛠️ Tech Stack
 
-### Frontend Frameworks & Libraries
+| Category | Technology | Version |
+|----------|-----------|---------|
+| **Framework** | Next.js | 16.1.6 |
+| **UI Library** | React | 19.2.3 |
+| **Language** | TypeScript | ^5 |
+| **Styling** | Tailwind CSS | ^4 |
+| **Backend** | Supabase | 2.95.3 |
+| **Database** | PostgreSQL | (via Supabase) |
+| **Auth** | Supabase Auth | (Google OAuth) |
+| **Realtime** | Supabase Realtime | WebSockets |
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| [Next.js](https://nextjs.org/) | 16.1.6 | React framework with App Router |
-| [React](https://react.dev/) | 19.2.3 | UI library |
-| [TypeScript](https://www.typescriptlang.org/) | ^5 | Type-safe JavaScript |
-| [Tailwind CSS](https://tailwindcss.com/) | ^4 | Utility-first CSS framework |
+---
 
-### Backend & Database
+## 🔥 Problems Faced & Solutions
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| [Supabase](https://supabase.com/) | 2.95.3 | Backend-as-a-Service (PostgreSQL, Auth, Realtime) |
-| [@supabase/supabase-js](https://supabase.com/docs/reference/javascript/introduction) | 2.95.3 | Supabase JavaScript client |
+This section documents the key challenges encountered during development and how they were solved.
 
-### Development Tools
+### 1. **Real-Time Sync Not Working**
 
-| Tool | Version | Purpose |
-|------|---------|---------|
-| [ESLint](https://eslint.org/) | ^9 | Code linting |
-| [PostCSS](https://postcss.org/) | - | CSS processing |
-| [Turbopack](https://turbo.build/pack) | Built-in | Fast bundler for Next.js |
+#### Problem
+After implementing the Supabase real-time listener, bookmarks were not syncing across tabs. The subscription status showed `CLOSED` instead of `SUBSCRIBED`.
 
+#### Root Causes Identified
+1. Supabase client was not configured with real-time options
+2. Real-time was not enabled on the `bookmarks` table in Supabase dashboard
+3. Channel configuration had unnecessary options causing conflicts
+
+#### Solution
+```typescript
+// ❌ Before: Missing realtime config
+const supabase = createClient(url, key);
+
+// ✅ After: Added realtime configuration
+const supabase = createClient(url, key, {
+  realtime: {
+    params: {
+      eventsPerSecond: 10,
+    },
+  },
+});
+```
+
+**Additional Steps:**
+- Enabled real-time in Supabase Dashboard → Database → Replication
+- Simplified channel name from `"realtime-bookmarks"` to `"public:bookmarks"`
+- Removed unnecessary broadcast/presence config options
+- Added comprehensive error logging to diagnose connection issues
+
+**Result:** Real-time sync now works perfectly. Adding a bookmark in one tab instantly appears in all other open tabs.
+
+---
+
+### 2. **React Hydration Error**
+
+#### Problem
+Console showed hydration mismatch error:
+```
+A tree hydrated but some attributes of the server rendered HTML didn't match the client properties
+```
+
+The error pointed to the `<body>` tag with an unexpected `cz-shortcut-listen="true"` attribute.
+
+#### Root Cause
+Browser extensions (like Chrome extensions) inject attributes into the DOM after server-side rendering but before React hydration, causing a mismatch.
+
+#### Solution
+```tsx
+// Added suppressHydrationWarning to body tag
+<body
+  className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+  suppressHydrationWarning
+>
+  {children}
+</body>
+```
+
+**Why This Works:** The `suppressHydrationWarning` prop tells React to ignore hydration mismatches on this specific element, which is safe since the attributes are added by browser extensions and don't affect functionality.
+
+**Result:** Clean console with no hydration warnings.
+
+---
+
+### 3. **Responsive Design Challenges**
+
+#### Problem
+The app looked great on desktop but was unusable on mobile:
+- Text was too large and overflowed
+- Layout didn't stack properly
+- Touch targets were too small
+- Spacing was inconsistent across screen sizes
+
+#### Solution: Mobile-First Responsive Design
+
+**Implemented Tailwind Breakpoints:**
+```tsx
+// ❌ Before: Fixed desktop sizes
+<h1 className="text-8xl">MARKSYNC</h1>
+
+// ✅ After: Responsive scaling
+<h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
+  MARKSYNC
+</h1>
+```
+
+**Key Changes:**
+1. **Layout:** Changed from `md:flex-row` to `lg:flex-row` for better tablet experience
+2. **Typography:** Implemented responsive text sizes (text-4xl → text-8xl)
+3. **Spacing:** Used responsive padding (`p-4 sm:p-6 md:p-8`)
+4. **Components:** Made all UI elements scale appropriately
+5. **Touch Targets:** Ensured buttons and inputs are finger-friendly on mobile
+
+**Breakpoint Strategy:**
+- **Mobile** (`< 640px`): Compact, single-column layout
+- **Tablet** (`640px - 1024px`): Increased spacing, still single-column
+- **Desktop** (`≥ 1024px`): Two-column layout, maximum sizes
+
+**Result:** App now provides optimal experience on all devices from iPhone SE to 4K monitors.
+
+---
+
+### 4. **Supabase Client Initialization**
+
+#### Problem
+Multiple instances of Supabase client were being created, potentially causing memory leaks and connection issues.
+
+#### Solution
+Implemented singleton pattern with lazy initialization:
+
+```typescript
+let supabaseInstance: SupabaseClient | null = null;
+
+export function getSupabase() {
+  if (!supabaseInstance) {
+    supabaseInstance = createClient(url, key, config);
+  }
+  return supabaseInstance;
+}
+
+// Proxy for backward compatibility
+export const supabase = new Proxy({} as SupabaseClient, {
+  get: (_target, prop) => {
+    const client = getSupabase();
+    return client[prop as keyof SupabaseClient];
+  }
+});
+```
+
+**Benefits:**
+- Single client instance across the app
+- Lazy initialization (only created when needed)
+- Backward compatible with existing code
+
+---
+
+### 5. **Row Level Security (RLS) Policies**
+
+#### Problem
+Users could potentially see or modify other users' bookmarks without proper security policies.
+
+#### Solution
+Implemented comprehensive RLS policies:
+
+```sql
+-- Users can only view their own bookmarks
+CREATE POLICY "Users can view their own bookmarks"
+  ON bookmarks FOR SELECT
+  USING (auth.uid() = user_id);
+
+-- Users can only insert their own bookmarks
+CREATE POLICY "Users can insert their own bookmarks"
+  ON bookmarks FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+-- Users can only delete their own bookmarks
+CREATE POLICY "Users can delete their own bookmarks"
+  ON bookmarks FOR DELETE
+  USING (auth.uid() = user_id);
+```
+
+**Security Benefits:**
+- Database-level security (not just client-side)
+- Automatic enforcement by PostgreSQL
+- Protection against API manipulation
+- Works seamlessly with real-time subscriptions
+
+---
+
+### 6. **Optimistic UI Updates**
+
+#### Problem
+When deleting a bookmark, there was a noticeable delay before the UI updated, making the app feel slow.
+
+#### Solution
+Implemented optimistic updates:
+
+```typescript
+const deleteBookmark = async (id: string) => {
+  // Optimistic update - remove from UI immediately
+  setBookmarks(prev => prev.filter(b => b.id !== id));
+  
+  const { error } = await supabase
+    .from("bookmarks")
+    .delete()
+    .eq("id", id);
+  
+  if (error) {
+    // Revert on error
+    await fetchBookmarks();
+  }
+};
+```
+
+**Result:** Instant UI feedback, better user experience.
+
+---
 
 ## 🚀 Getting Started
 
@@ -53,7 +264,7 @@ MarkSync is a modern, real time bookmark management application that helps you o
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Soumik-R/marksync.git
 cd marksync
 ```
 
@@ -61,8 +272,6 @@ cd marksync
 
 ```bash
 npm install
-# or
-yarn install
 ```
 
 ### 3. Set Up Supabase
@@ -73,38 +282,42 @@ yarn install
 
 ```sql
 -- Create bookmarks table
-create table bookmarks (
-  id uuid default gen_random_uuid() primary key,
-  title text not null,
-  url text not null,
-  user_id uuid references auth.users not null,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+CREATE TABLE bookmarks (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  url TEXT NOT NULL,
+  user_id UUID REFERENCES auth.users NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 -- Enable Row Level Security
-alter table bookmarks enable row level security;
+ALTER TABLE bookmarks ENABLE ROW LEVEL SECURITY;
 
--- Create policy for users to read their own bookmarks
-create policy "Users can view their own bookmarks"
-  on bookmarks for select
-  using (auth.uid() = user_id);
+-- Create policies
+CREATE POLICY "Users can view their own bookmarks"
+  ON bookmarks FOR SELECT
+  USING (auth.uid() = user_id);
 
--- Create policy for users to insert their own bookmarks
-create policy "Users can insert their own bookmarks"
-  on bookmarks for insert
-  with check (auth.uid() = user_id);
+CREATE POLICY "Users can insert their own bookmarks"
+  ON bookmarks FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
 
--- Create policy for users to delete their own bookmarks
-create policy "Users can delete their own bookmarks"
-  on bookmarks for delete
-  using (auth.uid() = user_id);
+CREATE POLICY "Users can delete their own bookmarks"
+  ON bookmarks FOR DELETE
+  USING (auth.uid() = user_id);
 
--- Enable Realtime
-alter publication supabase_realtime add table bookmarks;
+-- Enable Realtime (CRITICAL for real-time sync)
+ALTER PUBLICATION supabase_realtime ADD TABLE bookmarks;
 ```
 
-4. Enable Google OAuth:
-   - Go to **Authentication** > **Providers**
+4. **Enable Real-time in Dashboard:**
+   - Go to **Database** → **Replication**
+   - Find `bookmarks` table
+   - Toggle **Enable Realtime** to ON
+   - Click **Save**
+
+5. **Enable Google OAuth:**
+   - Go to **Authentication** → **Providers**
    - Enable **Google**
    - Add your Google OAuth credentials
 
@@ -117,7 +330,7 @@ NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-⚠️ **Important**: Never commit `.env.local` to version control!
+⚠️ **Important:** Never commit `.env.local` to version control!
 
 ### 5. Run the Development Server
 
@@ -126,6 +339,8 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to see the app.
+
+---
 
 ## 📋 Available Scripts
 
@@ -136,31 +351,7 @@ Open [http://localhost:3000](http://localhost:3000) to see the app.
 | `npm run start` | Start production server |
 | `npm run lint` | Run ESLint to check code quality |
 
-## 🔄 Development Workflow
-
-### 1. **Local Development**
-```bash
-# Start development server
-npm run dev
-
-# Make changes to code
-# The browser will auto-reload on save
-```
-
-### 2. **Testing Build**
-```bash
-# Create production build
-npm run build
-
-# Test production build locally
-npm run start
-```
-
-### 3. **Code Quality**
-```bash
-# Check for linting issues
-npm run lint
-```
+---
 
 ## 🌐 Deployment
 
@@ -173,75 +364,70 @@ npm run lint
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 4. Deploy! 🚀
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/marksync)
-
-### Important Deployment Notes
-
+**Important Deployment Notes:**
 - ✅ Environment variables must use `NEXT_PUBLIC_` prefix for client-side access
-- ✅ Configure Supabase redirect URLs in Authentication > URL Configuration
+- ✅ Configure Supabase redirect URLs in Authentication → URL Configuration
 - ✅ Add your Vercel domain to allowed OAuth redirect URLs
-
-## 🎯 Key Features Explained
-
-### Real-time Synchronization
-
-MarkSync uses Supabase Realtime to instantly sync bookmarks across all connected clients.
-
-### Authentication Flow
-
-- Google OAuth integration via Supabase Auth
-- Session management with automatic token refresh
-- Secure Row Level Security (RLS) policies
-
-### Responsive Design
-
-- Mobile-first approach with Tailwind CSS
-- Adaptive layout: stacks vertically on mobile, side-by-side on desktop
-- Touch-friendly UI elements
-
-### Performance Optimizations
-
-- Lazy initialization of Supabase client
-- Optimized state management with React hooks
-- Turbopack for ultra-fast development builds
-
-## 🔒 Security
-
-- Row Level Security (RLS) ensures users can only access their own bookmarks
-- Environment variables keep sensitive data secure
-- OAuth 2.0 authentication via Google
-- HTTPS-only connections in production
-
-## 🐛 Troubleshooting
-
-### Build Error: "supabaseUrl is required"
-
-Make sure your environment variables are properly set:
-1. Check `.env.local` file exists with correct values
-2. Restart development server after adding variables
-3. For Vercel: Add variables in project settings
-
-### Bookmarks Not Loading
-
-1. Check browser console for errors
-2. Verify Supabase RLS policies are set correctly
-3. Ensure you're authenticated
-4. Check network tab for failed API calls
-
-### OAuth Redirect Error
-
-1. Add your domain to Supabase Auth > URL Configuration
-2. Ensure redirect URL matches your deployment URL
-3. Check Google OAuth settings
-
-## 👨‍💻 Author
-
-Created with ❤️ by Soumik
-
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are welcome!
 
 ---
 
-**Built with Next.js 16 + Supabase + TypeScript + Tailwind CSS**
+## 🔒 Security Features
+
+- **Row Level Security (RLS)** - Users can only access their own bookmarks
+- **Environment Variables** - Sensitive data kept secure
+- **OAuth 2.0** - Secure authentication via Google
+- **HTTPS-only** - Encrypted connections in production
+- **Database-level Security** - PostgreSQL policies enforce access control
+
+---
+
+## 🐛 Troubleshooting
+
+### Real-time Not Working
+
+**Symptoms:** Bookmarks don't sync across tabs
+
+**Solutions:**
+1. Check browser console for subscription status
+2. Verify real-time is enabled in Supabase Dashboard → Database → Replication
+3. Ensure RLS policies allow SELECT for authenticated users
+4. Check that `ALTER PUBLICATION supabase_realtime ADD TABLE bookmarks;` was run
+
+### OAuth Redirect Error
+
+**Solutions:**
+1. Add your domain to Supabase Auth → URL Configuration
+2. Ensure redirect URL matches your deployment URL
+3. Check Google OAuth settings in Google Cloud Console
+
+### Hydration Errors
+
+**Solution:** Already handled with `suppressHydrationWarning` on body tag
+
+---
+
+## 👨‍💻 Author
+
+**Soumik Roy**
+
+- LinkedIn: [mesoumikr](https://www.linkedin.com/in/mesoumikr/)
+- Email: soumikroy7272@gmail.com
+- Instagram: [@soumik.roy_](https://www.instagram.com/soumik.roy_)
+
+---
+
+## 📝 License
+
+This project is open source and available under the MIT License.
+
+---
+
+## 🙏 Acknowledgments
+
+- Built with [Next.js](https://nextjs.org/)
+- Backend powered by [Supabase](https://supabase.com/)
+- Styled with [Tailwind CSS](https://tailwindcss.com/)
+
+---
+
+**Made with ❤️ by Soumik Roy**
