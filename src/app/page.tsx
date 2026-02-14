@@ -178,6 +178,35 @@ export default function Home() {
 
   //UI changes
   return (
+    <>
+      <style jsx>{`
+        @keyframes glow {
+          0%, 100% {
+            text-shadow: 0 0 10px rgba(147, 51, 234, 0.3),
+                         0 0 20px rgba(147, 51, 234, 0.2),
+                         0 0 30px rgba(147, 51, 234, 0.1);
+            filter: brightness(1);
+          }
+          50% {
+            text-shadow: 0 0 20px rgba(147, 51, 234, 0.8),
+                         0 0 40px rgba(147, 51, 234, 0.6),
+                         0 0 60px rgba(147, 51, 234, 0.4);
+            filter: brightness(1.3);
+          }
+        }
+        .glow-1 {
+          animation: glow 2s ease-in-out infinite;
+          animation-delay: 0s;
+        }
+        .glow-2 {
+          animation: glow 2s ease-in-out infinite;
+          animation-delay: 0.7s;
+        }
+        .glow-3 {
+          animation: glow 2s ease-in-out infinite;
+          animation-delay: 1.4s;
+        }
+      `}</style>
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-[#77fcef] to-pink-50 flex items-start p-8">
       {/* Left Section - Project Name */}
       <div className="flex-1 flex items-start justify-center px-8">
@@ -189,15 +218,15 @@ export default function Home() {
           
           {/* Instructions */}
           <div className="mt-24 space-y-10">
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-6 glow-1">
               <span className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent w-16 text-right">1.</span>
               <p className="text-3xl font-medium text-gray-700">Enter Bookmark Title</p>
             </div>
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-6 glow-2">
               <span className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent w-16 text-right">2.</span>
               <p className="text-3xl font-medium text-gray-700">Give us the link</p>
             </div>
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-6 glow-3">
               <span className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent w-16 text-right">3.</span>
               <p className="text-3xl font-medium text-gray-700">Forget about it</p>
             </div>
@@ -302,6 +331,7 @@ export default function Home() {
         )}
       </div>
     </div>
+    </>
   );
 }
 
