@@ -67,6 +67,8 @@
 
 //TEMP
 
+export const dynamic = "force-dynamic";
+
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
