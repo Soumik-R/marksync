@@ -171,24 +171,33 @@ export default function Home() {
 
   //UI changes
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 flex items-center p-4" style={{ justifyContent: 'flex-start', paddingLeft: '55%' }}>
-      {!user ? (
-        <div className="text-center space-y-6">
-          <div className="space-y-2">
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              MarkSync
-            </h1>
-            <p className="text-gray-600 text-lg">Your Beautiful Bookmark Manager</p>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 flex items-center p-8">
+      {/* Left Section - Project Name */}
+      <div className="flex-1 flex items-center justify-center px-8">
+        <h1 className="text-8xl font-black bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          MARKSYNC
+        </h1>
+      </div>
+
+      {/* Right Section - Login/Dashboard Card */}
+      <div className="flex-1 flex items-center justify-center px-8">
+        {!user ? (
+          <div className="text-center space-y-6">
+            <div className="space-y-2">
+              <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                MarkSync
+              </h1>
+              <p className="text-gray-600 text-lg">Your Beautiful Bookmark Manager</p>
+            </div>
+            <button
+              onClick={login}
+              className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-2xl shadow-2xl hover:shadow-purple-500/50 hover:scale-105 transition-all duration-300 font-semibold"
+            >
+              Login with Google
+            </button>
           </div>
-          <button
-            onClick={login}
-            className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-2xl shadow-2xl hover:shadow-purple-500/50 hover:scale-105 transition-all duration-300 font-semibold"
-          >
-            Login with Google
-          </button>
-        </div>
-      ) : (
-        <div className="bg-white/80 backdrop-blur-lg shadow-2xl rounded-3xl p-8 w-full max-w-md space-y-6 border border-white/20">
+        ) : (
+          <div className="bg-white/80 backdrop-blur-lg shadow-2xl rounded-3xl p-8 w-full max-w-md space-y-6 border border-white/20">
 
           <div className="text-center border-b border-gray-200 pb-4">
             <img
@@ -264,7 +273,8 @@ export default function Home() {
           </button>
 
         </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
